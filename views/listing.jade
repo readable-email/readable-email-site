@@ -1,0 +1,68 @@
+extends layout
+
+block title
+  title= list._id
+
+
+block scripts
+  script(src=asset('/client/listing.js'))
+
+mixin pagination(page)
+  ul.pagination
+    if first
+      li.disabled
+        a(disabled) « Newer
+    else
+      li
+        a(href=previousPage rel='previous') « Newer
+    li
+      a(href=path) Page #{page}
+    if last
+      li.disabled
+        a(disabled) Older »
+    else
+      li
+        a(href=nextPage, rel='next') Older »
+
+block navigation
+  ul.nav.navbar-nav
+    li.active
+      a(href='/' + list._id)= list._id
+
+
+block content
+  if first
+    .jumbotron.masthead
+      .row
+        .col-md-12
+          h1= list._id
+      .row
+        .col-md-8.col-md-offset-2
+          p= list.description
+  else
+    h1= list._id
+  .row
+    .col-md-12
+      ul.topics
+        for topic in topics
+          - var href = topic._id.replace(/^.*\#/, list._id + '/');
+
+          li.topic-title
+            h4
+              i.icon-envelope
+              |  &nbsp;
+              a(href=href)= topic.subject
+            p
+              | created by
+              b  #{topic.first.name || topic.first.email.replace(/@/g, ' at ')}
+              |  #{topic.start.fromNow()}
+              if topic.end.fromNow() != topic.start.fromNow()
+                |  (updated #{topic.end.fromNow()})
+              span.message-count
+                a(href=href)
+                  i.icon-comments-alt
+                  |  #{topic.messages} messages
+
+
+  .center
+    mixin pagination(page)

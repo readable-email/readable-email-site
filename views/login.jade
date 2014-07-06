@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  .jumbotron.masthead
+    h2 LOGIN
+    p.
+      In order to manage your sponsorship, and to access advanced funtionality in the
+      future, you must sign in via GitHub. If you don't have a GitHub account, and this
+      is preventing you from logging in, please #[a(href="mailto:contact@jepso.com") e-mail me]
+      and I'll look into adding other sign in methods.
+    a.btn.btn-lg.btn-primary.btn-block(href="/login/github?return=" + encodeURIComponent(returnAddress))
+      i.icon-github-alt
+      | &nbsp; Sign In With GitHub

@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    block title
+      title Readable Lists
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    block head
+    link(href='//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css', rel='stylesheet')
+    link(href=asset('/style/bundle.css'), rel='stylesheet')
+  body
+    #wrap
+      .navbar.navbar-fixed-top.navbar-inverse
+        .container
+          .navbar-header
+            button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='/') Readable Lists
+          .collapse.navbar-collapse
+            block navigation
+            ul.nav.navbar-nav.navbar-right
+              li
+                if !isAuthenticated
+                  a(href="/login/github?return=" + encodeURIComponent(url)) login
+                else
+                  li.dropdown
+                    a.dropdown-toggle(href="/account" data-toggle="dropdown")
+                      = user.email
+                      span.caret
+                    ul.dropdown-menu(role='menu')
+                      li
+                        a(href="/account") account
+                      li
+                        a(href="/logout?return=" + encodeURIComponent(url)) logout
+      #content.container
+        block content
+        if sponsorships && sponsorships.length > 0
+          .panel.panel-default
+            .panel-heading
+              h3.panel-title Sponsored By
+            .panel-body
+              p
+                = sponsorships.slice(0, sponsorships.length - 1).join(', ')
+                = sponsorships.length === 1 ? sponsorships[0] : ' and ' + sponsorships[sponsorships.length - 1]
+              a(href="/account/sponsor?list=" + encodeURIComponent(list._id) + "&return=" + encodeURIComponent(url))
+                | (become a sponsor for $20 per month)
+      #push
+    #footer-wrapper
+      footer
+        p
+          | Run by&nbsp;
+          a.jepso(href='https://www.jepso.com') JEPSO
+        p By using this site you consent to the use of cookies
+
+    script(src='http://code.jquery.com/jquery-1.10.1.min.js')
+    script(src='//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js')
+    block scripts

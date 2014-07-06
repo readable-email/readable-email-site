@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h1= user.email
+  if user.active_card
+    h2 Card
+    dl.dl-horizontal
+      dt Card Number
+      dd ....#{user.active_card.last4 }
+      dt Brand
+      dd= user.active_card.brand
+      dt Expires Month
+      dd= user.active_card.exp_month
+      dt Expires Year
+      dd= user.active_card.exp_year
+  if user.subscriptions.total_count > 0
+    h2 Sponsorships
+    table.table.table-hover
+      thead
+        tr
+          th List Name
+          th Sponsor Name
+          th
+      tbody
+        each subscription in user.subscriptions.data
+          tr
+            td= subscription.metadata.list
+            td= subscription.metadata.name || 'anonymous'
+            td(style="text-align: right")
+              a(href='/account/sponsorship/cancel') cancel

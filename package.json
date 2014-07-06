@@ -1,0 +1,39 @@
+{
+  "name": "readable-lists-site",
+  "version": "0.0.0",
+  "description": "Website to display mailing lists in a readable format",
+  "keywords": [],
+  "dependencies": {
+    "express": "~4.5.0",
+    "jquery": "~2.1.1",
+    "twbs": "0.0.6",
+    "jade": "~1.3.1",
+    "browserify-middleware": "~3.0.0",
+    "less-file": "0.0.8",
+    "keyboard": "0.0.1",
+    "moment": "~2.7.0",
+    "marked": "~0.3.2",
+    "highlight.js": "~8.0.0",
+    "ms": "~0.6.2",
+    "passport": "~0.2.0",
+    "passport-github": "~0.1.5",
+    "then-request": "0.0.4",
+    "promise": "~5.0.0",
+    "body-parser": "~1.4.3",
+    "cookie-session": "~1.0.2",
+    "stripe": "~2.7.3",
+    "class-list": "~0.1.1"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ForbesLindesay/readable-lists-site.git"
+  },
+  "author": "ForbesLindesay",
+  "license": "MIT"
+}

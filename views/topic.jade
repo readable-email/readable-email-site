@@ -1,0 +1,63 @@
+extends layout
+
+block title
+  title= topic.subject
+
+block scripts
+  script(src=asset('/client/topic.js'))
+
+
+block navigation
+  ul.nav.navbar-nav
+    li
+      a(href='/' + list._id)= list._id
+    li.active
+      a(href=path)= topic.subject
+
+block content
+  .row
+    .col-md-12
+      h1.topic-title= topic.subject
+  - var mid = 0
+  for message in messages
+    .row(data-message=message._id, id='content-' + mid)
+      .hidden-xs.col-sm-1.col-md-1.profile-image
+        a(href=message.from.profile)
+          img(src=message.from.avatar)
+      .col-xs-12.col-sm-11.col-md-11
+        .comment-wrapper
+          .comment-header
+            a(href='#content-' + mid) #
+            |  #{message.from.name || message.from.email.replace(/@/g, ' at ')} (#{message.date.fromNow()})
+            ul.buttons
+              if (message.updated)
+                li
+                  a.link(href='/history/' + encodeURIComponent(message._id) + '?path=' + encodeURIComponent(path))
+                    i.icon-time
+                    span.hidden-xs  History
+              li
+                button.showOriginal.link
+                  i.icon-envelope-alt
+                  span.hidden-xs  View Original
+              li
+                a.link(href=message._id)
+                  i.icon-share-alt
+                  span.hidden-xs  Go to Source
+          .comment-body
+            .formatted-view
+              != message.edited
+            .source-view(style='display: none;')
+              pre= message.body
+    - mid++
+  if hiddenMessages !== 0
+    .panel.panel-primary
+      .panel-heading
+        h3.panel-title Read More?
+      .panel-body
+        p.
+          There are #{hiddenMessages} messages that are fewer than 7 days old, but nobody has
+          sponsored this mailing list.
+        a.btn.btn-primary.btn-lg.btn-block(href="/account/sponsor?list=" + encodeURIComponent(list._id) + "&return=" + encodeURIComponent(url))
+          | Sponsor List
+          br
+          | (just $20 per month)

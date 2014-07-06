@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  form#payment-form.form-horizontal(action="/" method="POST")
+    mixin card()
+      .form-group
+        label(for="card_number" class="col-sm-4 control-label") Card Number
+        .col-sm-8
+          input.form-control(name='card_number' type='text' placeholder="4242 4242 4242 4242")
+      .form-group
+        label(for="card_cvc" class="col-sm-4 control-label") CVC
+        .col-sm-8
+          input.form-control(name='card_cvc' type='text' placeholder="123")
+      .form-group
+        label.col-sm-4.control-label(for="card_expiry") Expiration
+        .col-sm-8
+          input.form-control(name='card_expiry' type="text" placeholder="MM / YYYY")
+    if user.cards.total_count === 1
+      .form-group
+        label.col-sm-4.control-label(for="card") Card
+        .col-sm-8
+          select.form-control(name="card")
+            each card in user.cards.data
+              option(value=card.id)= (card.name || '...' + card.last4)
+            option(value="new-card") New Card
+      .collapse#new-card-form
+        +card()
+    else
+      +card()
+    .form-group
+      label.col-sm-4.control-label(for="sponsor_name") Sponsor Name (optional)
+      .col-sm-8
+        input.form-control(name="sponsor_name" type="text" placeholder="anonymous")
+    .form-group
+      .col-sm-offset-4.col-sm-8
+        input.btn.btn-primary.btn-lg.btn-block(type="submit" value="Sponsor " + listId + " for $20 per month")
+block scripts
+  script(src="https://js.stripe.com/v2/")
+  script.
+    Stripe.setPublishableKey("#{STRIPE_PUBLISHABLE_KEY}");
+    var listId = "#{listId}";
+    var returnAddress = "#{returnAddress}";
+  script(src=asset('client/sponsor.js'))

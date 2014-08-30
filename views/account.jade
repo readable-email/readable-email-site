@@ -25,6 +25,10 @@ block content
         each subscription in user.subscriptions.data
           tr
             td= subscription.metadata.list
-            td= subscription.metadata.name || 'anonymous'
+            td
+              if subscription.metadata.name && subscription.metadata.url
+                a(href=subscription.metadata.url)= subscription.metadata.name
+              else
+                = subscription.metadata.name || 'anonymous'
             td(style="text-align: right")
-              a(href='/account/sponsorship/cancel') cancel
+              a(href='/account/sponsor/' + subscription.id + '/edit') edit subscription

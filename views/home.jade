@@ -4,10 +4,10 @@ block content
   .jumbotron.masthead
     .row
       .col-md-12
-        h1 Readable Lists
+        h1 Readable Email
     .row
       .col-md-8.col-md-offset-2
-        p This site aims to provide an easily browsable, nicely formatted archive of the world's maiing lists.
+        p This site aims to provide an easily browsable, nicely formatted archive of the world's mailing lists.
 
   ul.list-group
     each list in lists
@@ -18,8 +18,6 @@ block content
           = list._id
         p.list-group-item-text= list.description
         p.list-group-item-text
-          if list._id === 'esdiscuss'
-            a(href='http://esdiscuss.org/1') Read Messages
-          else
-            a(href='/' + list._id) Read Messages
+
+          a(href='/list/' + list._id) Read Messages
 

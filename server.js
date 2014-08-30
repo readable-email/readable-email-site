@@ -7,18 +7,20 @@ var moment = require('moment');
 var ms = require('ms');
 var request = require('then-request');
 var express = require('express');
+var lusca = require('lusca');
 var less = require('less-file');
 var browserify = require('browserify-middleware');
 var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 var jade = require('jade');
-var Database = require('../readable-lists-api/lib/mongo.js');
+var favicon = require('serve-favicon');
+var connect = require('readable-lists-api');
 var processor = require('./lib/process-message.js');
-var stripe = require('./lib/stripe.js');
+// var stripe = require('./lib/stripe.js');
 var version = require('./package.json').version;
 
 
-var db = new Database(process.env.MONGO);
+var db = connect(process.env.DATABASE, process.env.BUCKET);
 var app = express();
 
 app.locals.asset = staticPath;
@@ -28,12 +30,15 @@ function staticPath(path) {
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
+
+app.use(favicon(__dirname + '/favicon.ico'));
 app.use(staticPath('/style'), less(__dirname + '/style/index.less'));
 app.get(staticPath('/client/listing.js'), browserify(__dirname + '/client/listing.js'));
 app.get(staticPath('/client/topic.js'), browserify(__dirname + '/client/topic.js'));
 app.get(staticPath('/client/sponsor.js'), browserify(__dirname + '/client/sponsor.js'));
 
 
+/*
 passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
@@ -57,6 +62,7 @@ passport.use(new GitHubStrategy({
     });
   }).nodeify(done);
 }));
+*/
 
 app.use(require('body-parser').urlencoded({extended: true}));
 app.use(require('body-parser').json());
@@ -64,8 +70,21 @@ app.use(require('cookie-session')({
   keys: [process.env.COOKIE_SECRET || 'adfkasjast'],
   signed: true
 }));
+app.use(lusca.xframe('DENY'));
+app.use(lusca.xssProtection());
+app.use(function (req, res, next) {
+  req.session._csrfSecret = req.session.csrfSecret;
+  next();
+});
+app.use(lusca.csrf());
+app.use(function (req, res, next) {
+  req.session.csrfSecret = req.session._csrfSecret;
+  next();
+});
+/*
 app.use(passport.initialize());
 app.use(passport.session());
+*/
 
 app.use(function (req, res, next) {
   res.locals.path = req.path;
@@ -79,9 +98,20 @@ app.get('/', function (req, res, next) {
     res.render('home.jade', {lists: lists});
   }, next);
 });
+app.get('/premium', function (req, res, next) {
+  res.render('layout.jade');
+});
+app.post('/premium', function (req, res, next) {
+  db.addPremiumBeta(req.body.email);
+  res.redirect('/premium/subscribed');
+});
+app.get('/premium/subscribed', function (req, res, next) {
+  res.render('premium-subscribed.jade');
+});
 app.get('/login', function (req, res, next) {
   res.render('login.jade', {returnAddress: req.query.return});
 });
+/*
 app.get('/login/github', function (req, res, next) {
   passport.authenticate('github', {
     callbackURL: '/login/github?return=' + encodeURIComponent(req.query.return)
@@ -115,32 +145,46 @@ app.get('/account/sponsor', function (req, res, next) {
   });
 });
 app.post('/account/sponsor', function (req, res, next) {
-  return stripe.sponsor(req.user.id, req.body).done(function () {
+  if (!req.isAuthenticated()) {
+    return res.send(403);
+  }
+  stripe.sponsor(req.user.id, req.body).done(function () {
     res.json('added');
   }, next);
 });
+app.get('/account/sponsor/:sponsorship/edit', function (req, res, next) {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login/github?return=' + encodeURIComponent(req.url));
+  }
+  stripe.getSubscription(req.user.id, req.params.sponsorship).done(function (subscription) {
+    res.render('sponsor-edit.jade', {
+      sponsorship: subscription,
+      STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY
+    });
+  }, next);
+});
+*/
 
-app.all('/:list*', function (req, res, next) {
+app.all('/list/:list*', function (req, res, next) {
   db.getList(req.params.list).then(function (list) {
     req.list = list;
     res.locals.list = list;
     if (!req.list) return next();
-    return stripe.getAllSponsorships();
+    return []; // stripe.getAllSponsorships();
   }).then(function (sponsorships) {
     if (!req.list) return next();
     req.sponsorships = [];
     res.locals.sponsorships = req.sponsorships;
-    console.dir(sponsorships);
     for (var i = 0; i < sponsorships.length; i++) {
       if (sponsorships[i].list === req.list._id) {
-        req.sponsorships.push(sponsorships[i].name || 'anonymous');
+        req.sponsorships.push(sponsorships[i]);
       }
     }
   }).done(function () {
     next();
   }, next);
 });
-app.get('/:list', function (req, res, next) {
+app.get('/list/:list', function (req, res, next) {
   if (!req.list) return next();
   var page = +(req.query.page || 0);
   var numberPerPage = +(req.query['number-per-page'] || 40);
@@ -166,16 +210,13 @@ app.get('/:list', function (req, res, next) {
     });
   }, next);
 });
-app.get('/:list/:topic', function (req, res, next) {
+app.get('/list/:list/topic/:topic', function (req, res, next) {
   if (!req.list) return next();
-  function messageIsVisible(message) {
-    return req.sponsorships.length > 0 || (message.date.getTime() < Date.now() - ms('7 days'));
-  }
   db.getTopic(req.list.source + '#' + req.params.topic).then(function (topic) {
     if (!topic) return next();
     return db.getMessages(topic.subjectToken).then(function (messages) {
       if (messages.length === 0) return next();
-      var visibleMessages = messages.filter(messageIsVisible).map(function (message) {
+      var visibleMessages = messages.map(function (message) {
         var hash = crypto.createHash('md5').update(message.from.email.toLowerCase().trim()).digest('hex');
 
         message.from = {

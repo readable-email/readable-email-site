@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  form#payment-form.form-horizontal(action="/" method="POST")
+    .form-group
+      label.col-sm-4.control-label List ID
+      .col-sm-8
+        p.form-control-static= sponsorship.metadata.list
+    .form-group
+      label.col-sm-4.control-label(for="sponsor_name") Sponsor Name (optional)
+      .col-sm-8
+        input.form-control(name="sponsor_name" type="text" placeholder="anonymous" value=sponsorship.metadata.name)
+        p.help-block.
+          If you want to publicise the fact that you are sponsoring this list, tell us your name.
+    .form-group
+      label.col-sm-4.control-label(for="sponsor_url") Sponsor URL (optional)
+      .col-sm-8
+        input.form-control(name="sponsor_url" type="text" placeholder="http://example.com" value= value=sponsorship.metadata.url)
+        p.help-block.
+          If you want your name to link to somewhere, give us the url.
+    .form-group
+      .col-sm-offset-4.col-sm-8
+        input.btn.btn-primary.btn-lg.btn-block(type="submit" value="Update Subscription")
+    .form-group
+      .col-sm-offset-4.col-sm-8
+        a(href="mailto:contact@jepso.com?subject=" +
+        encodeURIComponent("[" + user.id + "/" + sponsorship.id + '] Cancel Subscription')) cancel sponsorship
+block scripts
+  script(src=asset('client/sponsor-edit.js'))

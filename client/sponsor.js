@@ -8,6 +8,7 @@ var number = document.querySelector('[name="card_number"]');
 var cvc = document.querySelector('[name="card_cvc"]');
 var expiry = document.querySelector('[name="card_expiry"]');
 var sponsorName = document.querySelector('[name="sponsor_name"]');
+var sponsorURL = document.querySelector('[name="sponsor_url"]');
 
 function clearErrors() {
   var errorHelp = document.querySelectorAll('.has-error span.help-block');
@@ -49,6 +50,7 @@ var inputs = [
   cvc,
   expiry,
   sponsorName,
+  sponsorURL,
   document.querySelector('input[type="submit"]'),
   paymentForm
 ];
@@ -114,7 +116,9 @@ function gotCard(id, isNew) {
       list: listId,
       card: id,
       isNew: isNew,
-      name: sponsorName.value
+      name: sponsorName.value,
+      url: sponsorURL.value,
+      _csrf: csrf
     }),
     headers: {'content-type': 'application/json'},
     method: 'POST'

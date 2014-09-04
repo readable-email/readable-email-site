@@ -212,7 +212,7 @@ app.get('/list/:list', function (req, res, next) {
 });
 app.get('/list/:list/topic/:topic', function (req, res, next) {
   if (!req.list) return next();
-  db.getTopic(req.list.source + '#' + req.params.topic).then(function (topic) {
+  db.getTopic(req.list.source, req.params.topic).then(function (topic) {
     if (!topic) return next();
     return db.getMessages(topic.subjectToken).then(function (messages) {
       if (messages.length === 0) return next();

@@ -45,7 +45,7 @@ block content
     .col-md-12
       ul.topics
         for topic in topics
-          - var href = topic._id.replace(/^.*\#/, '/list/' + list._id + '/topic/');
+          - var href = '/list/' + list._id + '/topic/' + topic.slug;
 
           li.topic-title
             h4

@@ -1,6 +1,6 @@
 {
   "name": "readable-lists-site",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Website to display mailing lists in a readable format",
   "host": "readable-email.org",
   "dependencies": {
@@ -21,7 +21,7 @@
     "passport": "~0.2.0",
     "passport-github": "~0.1.5",
     "promise": "~5.0.0",
-    "readable-lists-api": "0.0.4",
+    "readable-lists-api": "0.0.6",
     "serve-favicon": "^2.0.1",
     "stripe": "~2.7.3",
     "then-request": "0.0.4",

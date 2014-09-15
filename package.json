@@ -1,6 +1,6 @@
 {
   "name": "readable-lists-site",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Website to display mailing lists in a readable format",
   "host": "readable-email.org",
   "dependencies": {

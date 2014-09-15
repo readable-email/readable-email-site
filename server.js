@@ -1,7 +1,6 @@
 'use strict';
 
 var qs = require('querystring');
-var crypto = require('crypto');
 var Promise = require('promise');
 var moment = require('moment');
 var ms = require('ms');
@@ -14,8 +13,10 @@ var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 var jade = require('jade');
 var favicon = require('serve-favicon');
+var merge = require('merge');
 var connect = require('readable-lists-api');
-var processor = require('./lib/process-message.js');
+var handleMessage = require('./lib/handle-message');
+var cache = require('./lib/strong-cache.js');
 // var stripe = require('./lib/stripe.js');
 var version = require('./package.json').version;
 
@@ -209,44 +210,43 @@ app.get('/list/:list', function (req, res, next) {
     });
   }, next);
 });
+
+var renderTopics = jade.compileFile(__dirname + '/views/topic.jade');
 app.get('/list/:list/topic/:topic', function (req, res, next) {
   if (!req.list) return next();
   db.getTopic(req.list.source, req.params.topic).then(function (topic) {
     if (!topic) return next();
 
+    var etag = topic.etag + '-' + version;
     //check old etag
-    if (req.headers['if-none-match'] === topic.etag + '-' + version) {
+    if (req.headers['if-none-match'] === etag) {
       res.statusCode = 304;
       res.end();
       return;
     }
 
     //add new etag
-    res.setHeader('ETag', topic.etag + '-' + version);
+    res.setHeader('ETag', etag);
 
-    return db.getMessages(topic.subjectToken).then(function (messages) {
-      if (messages.length === 0) return next();
-      var visibleMessages = messages.map(function (message) {
-        var hash = crypto.createHash('md5').update(message.from.email.toLowerCase().trim()).digest('hex');
-
-        message.from = {
-          name: message.from.name,
-          email: message.from.email,
-          hash: hash,
-          avatar: 'https://secure.gravatar.com/avatar/' + hash + '?s=200&d=mm',
-          profile: 'http://www.gravatar.com/' + hash
-        };
-
-        message.date = moment(message.date);
-
-        message.edited = processor.renderMessage(message.edited || processor.processMessage(message.body));
-
-        return message;
-      });
-      res.render('topic.jade', {
-        topic: topic,
-        messages: visibleMessages,
-        hiddenMessages: messages.length - visibleMessages.length
+    var cachePath = 'cache/list/' + req.params.list + '/topic/' + req.params.topic + '/' + etag;
+    return cache.getStream(cachePath).then(function (body) {
+      if (body.statusCode === 200) {
+        return body.pipe(res);
+      }
+      console.log('cache miss ' + req.url);
+      return db.getMessages(topic.subjectToken).then(function (messages) {
+        if (messages.length === 0) return next();
+        return Promise.all(messages.map(handleMessage));
+      }).then(function (messages) {
+        var html = renderTopics(merge(app.locals, res.locals, {
+          topic: topic,
+          messages: messages,
+          moment: moment,
+          hiddenMessages: messages.length - messages.length
+        }));
+        cache.putBuffer(cachePath, new Buffer(html)).done(function () {
+          res.send(html);
+        }, next);
       });
     });
   }).done(null, next);

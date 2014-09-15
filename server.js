@@ -86,6 +86,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 */
 
+var lists = [];
+function updateLists() {
+  db.getLists().done(function (l) {
+    lists = l;
+  }, function (err) {
+    console.error(err.stack || err);
+  });
+}
+updateLists();
+setInterval(updateLists, 60000);
+
 app.use(function (req, res, next) {
   res.locals.path = req.path;
   res.locals.url = req.url;
@@ -94,9 +105,7 @@ app.use(function (req, res, next) {
   next();
 });
 app.get('/', function (req, res, next) {
-  db.getLists().done(function (lists) {
-    res.render('home.jade', {lists: lists});
-  }, next);
+  res.render('home.jade', {lists: lists});
 });
 app.get('/premium', function (req, res, next) {
   res.render('layout.jade');
@@ -166,23 +175,13 @@ app.get('/account/sponsor/:sponsorship/edit', function (req, res, next) {
 */
 
 app.all('/list/:list*', function (req, res, next) {
-  db.getList(req.params.list).then(function (list) {
-    req.list = list;
-    res.locals.list = list;
-    if (!req.list) return next();
-    return []; // stripe.getAllSponsorships();
-  }).then(function (sponsorships) {
-    if (!req.list) return next();
-    req.sponsorships = [];
-    res.locals.sponsorships = req.sponsorships;
-    for (var i = 0; i < sponsorships.length; i++) {
-      if (sponsorships[i].list === req.list._id) {
-        req.sponsorships.push(sponsorships[i]);
-      }
-    }
-  }).done(function () {
-    next();
-  }, next);
+  var list = lists.filter(function (l) {
+    return l._id === req.params.list;
+  })[0];
+  if (!list) return next();
+  req.list = list;
+  res.locals.list = list;
+  next();
 });
 app.get('/list/:list', function (req, res, next) {
   if (!req.list) return next();
@@ -214,6 +213,17 @@ app.get('/list/:list/topic/:topic', function (req, res, next) {
   if (!req.list) return next();
   db.getTopic(req.list.source, req.params.topic).then(function (topic) {
     if (!topic) return next();
+
+    //check old etag
+    if (req.headers['if-none-match'] === topic.etag + '-' + version) {
+      res.statusCode = 304;
+      res.end();
+      return;
+    }
+
+    //add new etag
+    res.setHeader('ETag', topic.etag + '-' + version);
+
     return db.getMessages(topic.subjectToken).then(function (messages) {
       if (messages.length === 0) return next();
       var visibleMessages = messages.map(function (message) {

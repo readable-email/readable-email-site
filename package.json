@@ -35,7 +35,7 @@
   },
   "scripts": {
     "test": "mocha -R spec",
-    "deploy": "npm i heroku-release && heroku-release --app readable-email-site"
+    "deploy": "npm i heroku-release && heroku-release --app readable-email-site-staging"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 var qs = require('querystring');
 var Promise = require('promise');
 var moment = require('moment');

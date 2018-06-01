@@ -8,7 +8,7 @@ node_js:
 
 deploy:
   provider: script
-  script: npm run deploy
+  script: yarn run deploy
   on:
     branch: master
     node_js: 10.3.0

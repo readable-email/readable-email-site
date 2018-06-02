@@ -979,9 +979,9 @@ jade@^1.6.0:
     void-elements "~2.0.1"
     with "~4.0.0"
 
-jquery@~2.1.1:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-2.1.4.tgz#228bde698a0c61431dc2630a6a154f15890d2317"
+jquery@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -1211,9 +1211,9 @@ mold-source-map@0.3.0:
     convert-source-map "~0.3.1"
     through "~2.2.7"
 
-moment@~2.12.0:
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.12.0.tgz#dc2560d19838d6c0731b1a6afa04675264d360d6"
+moment@^2.22.2:
+  version "2.22.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
 
 mongodb-core@2.1.19:
   version "2.1.19"

@@ -54,7 +54,7 @@ passport.use(new GitHubStrategy({
   scope: 'user:email'
 }, function (accessToken, refreshToken, profile, done) {
   request('https://api.github.com/user/emails?access_token=' + accessToken, {
-    headers: { 'user-agent': 'esdiscuss.org', 'Accept': 'application/vnd.github.v3' }
+    headers: { 'user-agent': 'readable-email.org', 'Accept': 'application/vnd.github.v3' }
   }).then(function (res) {
     var email = JSON.parse(res.getBody().toString()).filter(function (e) { return e.primary && e.verified })[0];
     if (email) email = email.email;

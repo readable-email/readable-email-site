@@ -17,4 +17,4 @@ ADD views /app/views
 ADD favicon.ico /app/favicon.ico
 ADD server.js /app/server.js
 
-CMD node lib/server
+CMD node server.js

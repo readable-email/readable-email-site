@@ -37,8 +37,7 @@
     "typescript": "^3.9.7"
   },
   "scripts": {
-    "test": "mocha -R spec",
-    "deploy": "yarn add -D heroku-release && heroku-release --app readable-email-site-staging"
+    "test": "mocha -R spec"
   },
   "repository": {
     "type": "git",

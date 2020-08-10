@@ -83,8 +83,8 @@ commands:
           name: Install Dependencies
           command: yarn install --frozen-lockfile
       - run:
-          name: Build
-          command: yarn build
+          name: Test
+          command: yarn test
 
   npm_auth:
     description: 'Authenticate with the npm registry'

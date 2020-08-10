@@ -29,6 +29,9 @@ workflows:
           requires:
             - staging-approval
 
+      - deploy-production:
+          <<: *not_master
+
   release:
     jobs:
       - deploy-staging:

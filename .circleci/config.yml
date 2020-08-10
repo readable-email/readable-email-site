@@ -29,6 +29,9 @@ workflows:
           requires:
             - staging-approval
 
+      - deploy-production:
+          <<: *not_master
+
   release:
     jobs:
       - deploy-staging:
@@ -59,17 +62,14 @@ jobs:
       - push
       - deploy:
           environment: staging
-      - run: node test staging
 
   deploy-production:
     docker:
       - image: circleci/node:12.18.2
     steps:
       - setup
-      - run: node test staging
       - deploy:
           environment: production
-      - run: node test production
 
 commands:
   setup:

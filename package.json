@@ -19,7 +19,7 @@
     "lusca": "~1.0.1",
     "marked": "~0.3.5",
     "merge": "^1.2.1",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "ms": "~0.7.1",
     "passport": "~0.2.0",
     "passport-github": "~0.1.5",

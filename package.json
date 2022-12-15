@@ -9,7 +9,7 @@
     "class-list": "~0.1.1",
     "cookie-session": "~1.0.2",
     "dotenv": "^4.0.0",
-    "express": "~4.5.0",
+    "express": "~4.17.3",
     "highlight.js": "~8.0.0",
     "jade": "^1.6.0",
     "jquery": "^3.5.0",
